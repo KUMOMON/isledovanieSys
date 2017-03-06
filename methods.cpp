@@ -36,4 +36,16 @@ double Ravnomernost(const matrix<int> &);
 
 //}
 
+matrix<int> MplusM(const matrix<int> & a, const matrix<int> & b)
+{
+    matrix<int> rez;
+    int N = a.size();
 
+    for(indexer row=0;row<N;row++)
+    {
+        rez[row].reserve(N);
+        for(indexer cell=0;cell<N;cell++)
+            rez[row][cell]=a[row][cell] + b[row][cell];
+    }
+    return rez;
+}

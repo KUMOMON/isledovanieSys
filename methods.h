@@ -32,4 +32,4 @@ double RangSyst(const matrix<int>&);
 matrix<int> MxM(const matrix<int>&,const matrix<int>&);
 
 //складывает одну матрицу с другой
-matrix<int> MplusM(const matrix<int>&,const matrix<int>&);
+matrix<int> MplusM(const matrix<int>&, const matrix<int>&);
