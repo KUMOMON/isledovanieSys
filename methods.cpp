@@ -1,5 +1,5 @@
-#include <methods.h>
-#include <vector>
+#include <vector>   //модуль расширяемых массивов
+#include <math.h> //модуль математических функций
 
 
 
@@ -30,19 +30,52 @@ double Svaznost(const matrix<int>& m)
 double Izbitochnost(const matrix<int>& m)
 {
     double rez=0;
-    for(indexer row=0;row<m.size();row++)
-        for(indexer cell=0;cell<m[row].size();cell++)
+    indexer N = m.size();
+    for(indexer row=0;row<N;row++)
+        for(indexer cell=0;cell<N;cell++)
             rez+=m[row][cell];
 
-    rez/=(2*m.size()-2);
+    rez=(rez/(2*(N-1)))-1;
     return rez;
 }
 
-double Ravnomernost(const matrix<int> &);
-//{
-//    int VershinyCount = m.size();
+double Ravnomernost(const matrix<int> & m)
+{
+    //вершины
+    indexer N = m.size();
+    //ребра
+    indexer M=0;
 
-//}
+    //расчет количества дуг
+    for(indexer row=0;row<N;row++)
+        for(indexer cell = row;cell<N;cell++)
+            M+=m[row][cell];
+    //ро
+    int qsr=2*M/N;
+
+    //вектор с кол-вом дуг исхода(i - точка исхода)
+    //инициализация вектора с размерностью N
+    vector<int> qi(N);
+
+    for(indexer point=0;point<N;point++)
+    {
+        qi[point] = 0;
+
+        //проход по столбцам матрицы смежности
+        //для опред. точки графа
+        //для определения коли-ва дуг исхода
+        for(int cell=0;cell<N;cell++)
+            qi[point] += m[point][cell];
+    }
+
+    //среднее квадрватичное отклонение
+    int sko=0;
+    for(indexer point =0; point<N;point++)
+        sko+=(qi[point]-qsr)(qi[point]);
+
+    return sko;
+
+}
 
 
 matrix<int> MplusM(const matrix<int> & a, const matrix<int> & b)
