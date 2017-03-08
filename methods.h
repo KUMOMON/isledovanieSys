@@ -1,5 +1,4 @@
 #include<vector>
-using namespace std;
 
 /* About
  * Здесь представлен наобор методов
@@ -14,8 +13,18 @@ using namespace std;
  * Не рекомендуется испытывать судьбу
  */
 
+
+
+namespace islMethods {
+
+using namespace std;
+
+////////////////////////////////////////////////////////////////
+
 template<typename T>
 using matrix = vector<vector<T>>;
+
+////////////////////////////////////////////////////////////////
 
 //Возвращает коофициент связности по матрице смежности
 double Svaznost(const matrix<int>&);
@@ -40,3 +49,8 @@ matrix<int> MxM(const matrix<int>&,const matrix<int>&);
 
 //складывает одну матрицу с другой
 matrix<int> MplusM(const matrix<int>&, const matrix<int>&);
+
+}
+
+
+

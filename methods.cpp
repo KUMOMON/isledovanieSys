@@ -1,13 +1,21 @@
 #include <methods.h>
 #include <vector>
 
+
+
+namespace islMethods {
+
 using namespace std;
 
+////////////////////////////////////////////////////////////////
 
 template<typename T>
 using matrix = vector<vector<T>>;
 
 using indexer = unsigned int;
+
+////////////////////////////////////////////////////////////////
+
 
 double Svaznost(const matrix<int>& m)
 {
@@ -40,7 +48,7 @@ double Ravnomernost(const matrix<int> &);
 matrix<int> MplusM(const matrix<int> & a, const matrix<int> & b)
 {
     matrix<int> rez;
-    int N = a.size();
+    indexer N = a.size();
 
 
     rez.reserve(N);
@@ -56,10 +64,11 @@ matrix<int> MplusM(const matrix<int> & a, const matrix<int> & b)
 
 matrix<int> MxM(const matrix<int> & a, const matrix<int> & b)
 {
-
+    indexer N = a.size();
     matrix<int> rez;
+    rez.reserve(N);
 
-    for(indexer row=0;row<N;row++)
+    for(indexer row=0;row<a.size();row++)
         rez[row].reserve(N);
 
     //Спасибо MSDN
@@ -67,4 +76,8 @@ matrix<int> MxM(const matrix<int> & a, const matrix<int> & b)
         for(indexer cell=0;cell<N;cell++)
             for(indexer inner = 0; inner<N-1;inner++)
                 rez[row][cell]+=a[row][inner] + b[inner][cell];
+
+    return rez;
+}
+
 }
