@@ -48,11 +48,6 @@ double StepenCentr(const matrix<int>&);
 //Расм. рерсурсы в системе в порядке их значимости
 double RangSyst(const matrix<int>&);
 
-//Умножает одну матрицу на другую
-matrix<int> MxM(const matrix<int>&,const matrix<int>&);
-
-//складывает одну матрицу с другой
-matrix<int> MplusM(const matrix<int>&, const matrix<int>&);
 
 }
 

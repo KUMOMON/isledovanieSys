@@ -15,6 +15,17 @@ using indexer = unsigned int;
 //Возвращает все степени матрицы смежности
 vector<matrix<int>> GetSteps(const matrix<int>&);
 
+//структурная близость Q
+int StructProximity(const matrix<int>&);
+
+//Умножает одну матрицу на другую
+matrix<int> MxM(const matrix<int>&,const matrix<int>&);
+
+//складывает одну матрицу с другой
+matrix<int> MplusM(const matrix<int>&, const matrix<int>&);
+
+//Возвращает матрицы минимальных путей из I в J
+matrix<int> minPaths(const matrix<int>& m);
 ////////////////////////////////////////////////////////////////
 
 double Svaznost(const matrix<int>& m)
@@ -79,21 +90,12 @@ double Ravnomernost(const matrix<int> & m)
 
 double DiamStruct(const matrix<int>& m)
 {
-    //кол-во вершин
-    indexer N = m.size();
-    //Создание копии матрицы
-    matrix<int> D(m);
-    //Получение всех степеней этой матрицы
-    vector<matrix<int>> PN = GetSteps(m);
 
-    for(indexer stepen=0;stepen<N;stepen++)
-        for(indexer row=0;row<N;row++)
-            for(indexer coll=0;coll<N;coll++)
-                if((D[row][coll]==0)&(PN[stepen][row][coll]>0))
-                    D[row][coll] = stepen+1;
+    indexer N = m.size();        //кол-во вершин
+    matrix<int> D = minPaths(m); //Получение матрицы минимальных путей
 
-    int diametr =0;         //+диаметр структуры
 
+    int diametr =0;             //диаметр структуры
     for(indexer pointI=0;pointI<N;pointI++)
         for(indexer pointJ=0;pointJ<N;pointJ++)
             if(diametr<D[pointI][pointJ]) diametr = D[pointI][pointJ];
@@ -103,6 +105,64 @@ double DiamStruct(const matrix<int>& m)
 
 double StructCompactOtn(const matrix<int>& m)
 {
+    double Q_otn=0;             //Относительная структурная близость
+
+    indexer N = m.size();       //кол-во вершин
+    int Q = StructProximity(m); //структурная близость
+    int Qmin = N*(N-1);         //Минимальная структурная близость
+
+    Q_otn = static_cast<double>(Q)/static_cast<double>(Qmin)-1;
+
+    return Q_otn;
+}
+
+double StepenCentr(const matrix<int>& m)
+{
+
+    indexer N = m.size();               //кол-во вершин
+    auto matrixMinPaths = minPaths(m);  //матрица минимальных путей
+    int Q = StructProximity(m);         //структурная близость
+    vector<double> t(N);                //
+    double indexCentr = 0;              //индекс централизации
+
+    //Оценка централизации каждой точки
+    for(indexer pointI=0;pointI<N;pointI++)
+    {
+        t[pointI]=0;
+        for(indexer pointJ=0;pointJ<N;pointJ++)
+            if(pointI!=pointJ)
+                t[pointI]+=matrixMinPaths[pointI][pointJ];
+        t[pointI] = static_cast<double>(1)/t[pointI] ;
+        t[pointI]*=Q/2;
+    }
+
+    double tmax = 0;
+
+    for(indexer point=0;point<N;point++)
+        if(tmax<t[point]) tmax = t[point];
+
+    indexCentr = (N-1)*(2*tmax-N)*(1/(tmax*(N-2)));
+    return indexCentr;
+}
+
+int StructProximity(const matrix<int>& m)
+{
+    //кол-во вершин
+    indexer N = m.size();
+
+    //Создание копии матрицы
+    matrix<int> D = minPaths(m);
+
+    int Q = 0;              //структурная близость
+    for(indexer pointI=0;pointI<N;pointI++)
+        for(indexer pointJ=0;pointJ<N;pointJ++)
+            if(pointI!=pointJ) Q+=D[pointI][pointJ];
+
+    return Q;
+}
+
+matrix<int> minPaths(const matrix<int>& m)
+{
     //кол-во вершин
     indexer N = m.size();
     //Создание копии матрицы
@@ -110,23 +170,13 @@ double StructCompactOtn(const matrix<int>& m)
     //Получение всех степеней этой матрицы
     vector<matrix<int>> PN = GetSteps(m);
 
+    //Формирование матрицы минимальных путей
     for(indexer stepen=0;stepen<N;stepen++)
         for(indexer row=0;row<N;row++)
             for(indexer coll=0;coll<N;coll++)
                 if((D[row][coll]==0)&(PN[stepen][row][coll]>0))
                     D[row][coll] = stepen+1;
-
-    int Q = 0;              //структурная близость
-    int Qmin = N*(N-1);     //Минимальная структурная близость
-
-    double Q_otn=0;         //+Относительная структурная близость
-    for(indexer pointI=0;pointI<N;pointI++)
-        for(indexer pointJ=0;pointJ<N;pointJ++)
-            if(pointI!=pointJ) Q+=D[pointI][pointJ];
-
-    Q_otn = static_cast<double>(Q)/static_cast<double>(Qmin);
-
-    return Q_otn;
+    return D;
 }
 
 matrix<int> MplusM(const matrix<int> & a, const matrix<int> & b)
