@@ -33,10 +33,14 @@ double Svaznost(const matrix<int>&);
 double Izbitochnost(const matrix<int>&);
 
 //возвращает равномерность распределения связей по матрице смежности
+//или недоиспользование структуры при достижении максимальной связности
 double Ravnomernost(const matrix<int>&);
 
-//возвращает структурную компактность (близость элементов между собой)
-double StructCompact(const matrix<int>&);
+//Вычисляет диаметр структуры (х-ка относиться с структурной компактности)
+double DiamStruct(const matrix<int>&);
+
+//возвращает структурную компактность относительную (близость элементов между собой)
+double StructCompactOtn(const matrix<int>&);
 
 //Степень централизации в структуре
 double StepenCentr(const matrix<int>&);

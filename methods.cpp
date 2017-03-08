@@ -1,8 +1,6 @@
 #include <vector>   //модуль расширяемых массивов
 #include <math.h> //модуль математических функций
 
-
-
 namespace islMethods {
 
 using namespace std;
@@ -14,8 +12,10 @@ using matrix = vector<vector<T>>;
 
 using indexer = unsigned int;
 
-////////////////////////////////////////////////////////////////
+//Возвращает все степени матрицы смежности
+vector<matrix<int>> GetSteps(const matrix<int>&);
 
+////////////////////////////////////////////////////////////////
 
 double Svaznost(const matrix<int>& m)
 {
@@ -64,19 +64,70 @@ double Ravnomernost(const matrix<int> & m)
         //проход по столбцам матрицы смежности
         //для опред. точки графа
         //для определения коли-ва дуг исхода
-        for(int cell=0;cell<N;cell++)
+        for(indexer cell=0;cell<N;cell++)
             qi[point] += m[point][cell];
     }
 
     //среднее квадрватичное отклонение
-    int sko=0;
+    double sko=0;
     for(indexer point =0; point<N;point++)
-        sko+=(qi[point]-qsr)(qi[point]);
+        sko+=pow((qi[point]-qsr),2);
 
     return sko;
 
 }
 
+double DiamStruct(const matrix<int>& m)
+{
+    //кол-во вершин
+    indexer N = m.size();
+    //Создание копии матрицы
+    matrix<int> D(m);
+    //Получение всех степеней этой матрицы
+    vector<matrix<int>> PN = GetSteps(m);
+
+    for(indexer stepen=0;stepen<N;stepen++)
+        for(indexer row=0;row<N;row++)
+            for(indexer coll=0;coll<N;coll++)
+                if((D[row][coll]==0)&(PN[stepen][row][coll]>0))
+                    D[row][coll] = stepen+1;
+
+    int diametr =0;         //+диаметр структуры
+
+    for(indexer pointI=0;pointI<N;pointI++)
+        for(indexer pointJ=0;pointJ<N;pointJ++)
+            if(diametr<D[pointI][pointJ]) diametr = D[pointI][pointJ];
+
+    return diametr;
+}
+
+double StructCompactOtn(const matrix<int>& m)
+{
+    //кол-во вершин
+    indexer N = m.size();
+    //Создание копии матрицы
+    matrix<int> D(m);
+    //Получение всех степеней этой матрицы
+    vector<matrix<int>> PN = GetSteps(m);
+
+    for(indexer stepen=0;stepen<N;stepen++)
+        for(indexer row=0;row<N;row++)
+            for(indexer coll=0;coll<N;coll++)
+                if((D[row][coll]==0)&(PN[stepen][row][coll]>0))
+                    D[row][coll] = stepen+1;
+
+    int Q = 0;              //структурная близость
+    int Qmin = N*(N-1);     //Минимальная структурная близость
+
+    double Q_otn=0;         //+Относительная структурная близость
+    for(indexer pointI=0;pointI<N;pointI++)
+        for(indexer pointJ=0;pointJ<N;pointJ++)
+            if(pointI!=pointJ) Q+=D[pointI][pointJ];
+
+    Q_otn = static_cast<double>(Q)/static_cast<double>(Qmin);
+
+    return Q_otn;
+}
 
 matrix<int> MplusM(const matrix<int> & a, const matrix<int> & b)
 {
@@ -109,6 +160,22 @@ matrix<int> MxM(const matrix<int> & a, const matrix<int> & b)
         for(indexer cell=0;cell<N;cell++)
             for(indexer inner = 0; inner<N-1;inner++)
                 rez[row][cell]+=a[row][inner] + b[inner][cell];
+
+    return rez;
+}
+
+vector<matrix<int>> GetSteps(const matrix<int>& m)
+{
+    indexer N = m.size();
+
+    vector<matrix<int>> rez;
+    matrix<int> _step(m);
+
+    for(indexer step = 0;step<N;step++)
+    {
+        rez.push_back(_step);
+        _step = MxM(_step,m);
+    }
 
     return rez;
 }
