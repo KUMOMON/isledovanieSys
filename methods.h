@@ -45,9 +45,12 @@ double StructCompactOtn(const matrix<int>&);
 //Степень централизации в структуре
 double StepenCentr(const matrix<int>&);
 
+//Ранги элементов системы с длинной 3
 //Расм. рерсурсы в системе в порядке их значимости
-double RangSyst(const matrix<int>&);
+vector<double> RangElements3(const matrix<int>&);
 
+//Ранги элементов системы с длинной 4
+vector<double> RangElements4(const matrix<int>&);
 
 }
 

@@ -26,6 +26,11 @@ matrix<int> MplusM(const matrix<int>&, const matrix<int>&);
 
 //Возвращает матрицы минимальных путей из I в J
 matrix<int> minPaths(const matrix<int>& m);
+
+//Ранги элементов системы с длинной N
+//Расм. рерсурсы в системе в порядке их значимости
+vector<double> RangElementsN(const matrix<int>&,const unsigned int);
+
 ////////////////////////////////////////////////////////////////
 
 double Svaznost(const matrix<int>& m)
@@ -143,6 +148,44 @@ double StepenCentr(const matrix<int>& m)
 
     indexCentr = (N-1)*(2*tmax-N)*(1/(tmax*(N-2)));
     return indexCentr;
+}
+
+vector<double> RangElements3(const matrix<int>& m)
+{
+    return RangElementsN(m,3);
+}
+
+vector<double> RangElements4(const matrix<int>& m)
+{
+    return RangElementsN(m,4);
+}
+
+////////////////////////////////////////////////////////////////
+
+vector<double> RangElementsN(const matrix<int>& m,const unsigned int n)
+{
+    indexer N = m.size();          //кол-во вершин
+    auto _matrix = GetSteps(m);    //Получение всех степеней
+
+    vector<double> elementsRank(N);
+
+    //elementsRank[i]=top/down;
+
+    int down=0;
+    for(indexer i=0; i<N;i++)
+        for(indexer j=0; j<N;j++)
+            down+=_matrix[n][i][j];
+
+
+    for(indexer i=0;i<N;i++)
+    {
+        int top =0;
+        for(indexer j=0;j<N;j++)
+            top+=_matrix[n][i][j];
+
+        elementsRank[i] = static_cast<double>(top)/down;
+    }
+    return elementsRank;
 }
 
 int StructProximity(const matrix<int>& m)
