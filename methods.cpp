@@ -51,7 +51,7 @@ double Izbitochnost(const matrix<int>& m)
         for(indexer cell=0;cell<N;cell++)
             rez+=m[row][cell];
 
-    rez=(rez/(2*(N-1)))-1;
+    rez=(((rez/2)/(N-1))-1);
     return rez;
 }
 
@@ -60,14 +60,14 @@ double Ravnomernost(const matrix<int> & m)
     //вершины
     indexer N = m.size();
     //ребра
-    indexer M=0;
+    double M=0;
 
     //расчет количества дуг
     for(indexer row=0;row<N;row++)
         for(indexer cell = row;cell<N;cell++)
             M+=m[row][cell];
     //ро
-    int qsr=2*M/N;
+    double qsr=2*M/N;
 
     //вектор с кол-вом дуг исхода(i - точка исхода)
     //инициализация вектора с размерностью N
@@ -87,7 +87,7 @@ double Ravnomernost(const matrix<int> & m)
     //среднее квадрватичное отклонение
     double sko=0;
     for(indexer point =0; point<N;point++)
-        sko+=pow((qi[point]-qsr),2);
+        sko+=pow((static_cast<double>(qi[point])-qsr),2);
 
     return sko;
 
@@ -95,7 +95,6 @@ double Ravnomernost(const matrix<int> & m)
 
 double DiamStruct(const matrix<int>& m)
 {
-
     indexer N = m.size();        //кол-во вершин
     matrix<int> D = minPaths(m); //Получение матрицы минимальных путей
 
@@ -232,7 +231,7 @@ matrix<int> MplusM(const matrix<int> & a, const matrix<int> & b)
 
     for(indexer row=0;row<N;row++)
     {
-        rez[row].reserve(N);
+        rez[row] = vector<int>(N);
         for(indexer cell=0;cell<N;cell++)
             rez[row][cell]=a[row][cell] + b[row][cell];
     }
@@ -242,17 +241,20 @@ matrix<int> MplusM(const matrix<int> & a, const matrix<int> & b)
 matrix<int> MxM(const matrix<int> & a, const matrix<int> & b)
 {
     indexer N = a.size();
-    matrix<int> rez;
-    rez.reserve(N);
+    matrix<int> rez(N);
 
-    for(indexer row=0;row<a.size();row++)
-        rez[row].reserve(N);
+    for(indexer i = 0;i<rez.size();i++)
+    {
+        rez[i] = vector<int>(N);
+        for(indexer j = 0;j<rez[i].size();j++)
+            rez[i][j]=0;
+    }
 
     //Спасибо MSDN
     for(indexer row=0;row<N;row++)
         for(indexer cell=0;cell<N;cell++)
-            for(indexer inner = 0; inner<N-1;inner++)
-                rez[row][cell]+=a[row][inner] + b[inner][cell];
+            for(indexer inner = 0; inner<N;inner++)
+                rez[row][cell]+=a[row][inner] * b[inner][cell];
 
     return rez;
 }
@@ -267,7 +269,7 @@ vector<matrix<int>> GetSteps(const matrix<int>& m)
     for(indexer step = 0;step<N;step++)
     {
         rez.push_back(_step);
-        _step = MxM(_step,m);
+        _step = MxM(m,_step);
     }
 
     return rez;
