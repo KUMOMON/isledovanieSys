@@ -14,6 +14,7 @@ void ShowMatrixToMonitor(const matrix<int>&) noexcept;          //выводит
 void AnalysSystem(const matrix<int>& m);                        //выполняет анализ системы по матрице смежности
 matrix<int> LoadMatrixFromFile();                               //загружает матрицу из файла
 
+
 int main()
 {
 
@@ -164,7 +165,14 @@ matrix<int> LoadMatrixFromFile()
 
     //Создание объекта для работы с Excell документом
      Book* book = xlCreateBook();
-    book->load("matrixExell.xlsx");
+     //открытие файла
+     if(book->load("matrixExell.xlsx"))
+     {
+
+
+     }
+     else
+         cout<<"ошибка открытия файла.";
 
     return matrix<int>();
 
