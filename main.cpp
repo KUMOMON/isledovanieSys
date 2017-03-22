@@ -6,8 +6,10 @@
 
 using namespace std;
 
+//определение матрицы
 template<typename T>
 using matrix = vector<vector<T>>;
+
 
 matrix<int> GetSomeMatrixByIndex(const unsigned short int);     //выдает тестовую матрицу смежности графа (1-6)
 void ShowMatrixToMonitor(const matrix<int>&) noexcept;          //выводит матрицу на экран
@@ -15,12 +17,16 @@ void AnalysSystem(const matrix<int>& m);                        //выполня
 matrix<int> LoadMatrixFromFile();                               //загружает матрицу из файла
 
 
+//Константа указывающая имя документа из которого считывается матрица
+const char* DOCUMENT_NAME = "matrixExell.xlsx";
+
+
 int main()
 {
 
-    matrix<int> m = GetSomeMatrixByIndex(6);
+    //matrix<int> m = GetSomeMatrixByIndex(6);
+    matrix<int> m = LoadMatrixFromFile();
     cout<<endl;
-
     AnalysSystem(m);
     return 0;
 }
@@ -164,16 +170,39 @@ matrix<int> LoadMatrixFromFile()
     using namespace libxl;
 
     //Создание объекта для работы с Excell документом
-     Book* book = xlCreateBook();
-     //открытие файла
-     if(book->load("matrixExell.xlsx"))
-     {
+    Book* book = xlCreateBook();
+    //открытие файла
+    if(book->load(DOCUMENT_NAME))
+    {
+        //обращение к первой вкладке
+        Sheet* sheet = book->getSheet(0);
 
+        //Если такая вкладка существует в книге(документе)
+        if(sheet)
+        {
+            //проходим по строкам документа
+            for(unsigned int row = sheet->firstRow();row<sheet->lastRow(); ++row)
+            {
+                //проходим по столбцам строки
+                for(unsigned int col = sheet->firstCol(); col<sheet->lastCol();++col)
+                {
+                    //обращение к ячейке в указанной строке и колонке
+                    CellType cellType = sheet->cellType(row,col);
 
-     }
-     else
-         cout<<"ошибка открытия файла.";
+                    if(cellType == CELLTYPE_NUMBER)//Если в ячейке число то извлекаем его
+                        unsigned int num = sheet->readNum(row,col);
 
+                }
+            }
+
+        }
+
+    }
+    else
+        cout<<"ошибка открытия файла.";
+
+    //закрываем документ
+    book->release();
     return matrix<int>();
 
 }
