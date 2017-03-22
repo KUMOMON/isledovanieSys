@@ -1,6 +1,8 @@
 #include <iostream>
 #include <methods.h>
 #include <iomanip>
+#include <memory>
+#include <libxl.h>
 
 using namespace std;
 
@@ -10,6 +12,7 @@ using matrix = vector<vector<T>>;
 matrix<int> GetSomeMatrixByIndex(const unsigned short int);     //выдает тестовую матрицу смежности графа (1-6)
 void ShowMatrixToMonitor(const matrix<int>&) noexcept;          //выводит матрицу на экран
 void AnalysSystem(const matrix<int>& m);                        //выполняет анализ системы по матрице смежности
+matrix<int> LoadMatrixFromFile();                               //загружает матрицу из файла
 
 int main()
 {
@@ -152,5 +155,17 @@ void AnalysSystem(const matrix<int>& m)
         cout<<endl<<endl;
 
     }
+
+}
+
+matrix<int> LoadMatrixFromFile()
+{
+    using namespace libxl;
+
+    //Создание объекта для работы с Excell документом
+     Book* book = xlCreateBook();
+    book->load("matrixExell.xlsx");
+
+    return matrix<int>();
 
 }
