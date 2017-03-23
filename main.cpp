@@ -27,7 +27,11 @@ int main()
     //matrix<int> m = GetSomeMatrixByIndex(6);
     matrix<int> m = LoadMatrixFromFile();
     cout<<endl;
-    AnalysSystem(m);
+    if(m.size()>0)
+        AnalysSystem(m);
+    else
+        cout<<"file not found or matrix not exist";
+    system("pause");
     return 0;
 }
 
@@ -181,7 +185,7 @@ matrix<int> LoadMatrixFromFile()
     Book* book = xlCreateBook();
 
     //открытие файла
-    book->load("D:\\Work\\GitHubProjects\\islMethods\\isledovanieSys\\matrixExell.xls");
+    book->load("matrixExell.xls");
     if(book)
     {
         //обращение к первой вкладке
@@ -219,7 +223,7 @@ void SafeResultInExcellFile(vector<double> someParams,bool qsb,vector<double> ra
     Book* book = xlCreateBook();
 
     //открытие файла
-    bool loadResult = book->load("D:\\Work\\GitHubProjects\\islMethods\\isledovanieSys\\matrixExell.xls");
+    bool loadResult = book->load("matrixExell.xls");
     if(loadResult)
     {
         if(book->sheetCount()<2)
@@ -268,6 +272,6 @@ void SafeResultInExcellFile(vector<double> someParams,bool qsb,vector<double> ra
     }
     else
         cout<<book->errorMessage();
-    book->save("1.xls");
+    book->save("matrixExell.xls");
     book->release();
 }
