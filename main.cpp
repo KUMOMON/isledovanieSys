@@ -1,23 +1,37 @@
 #include <iostream>
 #include <methods.h>
 #include <iomanip>
+#include <memory>
+#include "libxl.h"
+#include <vector>
 
 using namespace std;
 
+//определение матрицы
 template<typename T>
 using matrix = vector<vector<T>>;
+
 
 matrix<int> GetSomeMatrixByIndex(const unsigned short int);     //выдает тестовую матрицу смежности графа (1-6)
 void ShowMatrixToMonitor(const matrix<int>&) noexcept;          //выводит матрицу на экран
 void AnalysSystem(const matrix<int>& m);                        //выполняет анализ системы по матрице смежности
+matrix<int> LoadMatrixFromFile();                               //загружает матрицу из файла
+
+//выполняет сохранение результатов исследования в файл
+void SafeResultInExcellFile(vector<double>,bool,vector<double>,vector<double>);
+
 
 int main()
 {
 
-    matrix<int> m = GetSomeMatrixByIndex(6);
+    //matrix<int> m = GetSomeMatrixByIndex(6);
+    matrix<int> m = LoadMatrixFromFile();
     cout<<endl;
-
-    AnalysSystem(m);
+    if(m.size()>0)
+        AnalysSystem(m);
+    else
+        cout<<"file not found or matrix not exist";
+    system("pause");
     return 0;
 }
 
@@ -108,7 +122,7 @@ void AnalysSystem(const matrix<int>& m)
     if(R<0)
         cout<<"Struktura svyazno-izbytochna"<<'.'<<endl;
     cout<<endl;
-
+    vector<double> rez1={ks,R};
     if(ksb)
     {
         double sko = 0;            //Равномерность распределения связей
@@ -150,7 +164,114 @@ void AnalysSystem(const matrix<int>& m)
         for(unsigned int i = 0;i<rank4.size();i++)
             cout<<setw(4)<<rank4[i]<<'|';
         cout<<endl<<endl;
-
+        rez1.push_back(sko);
+        rez1.push_back(diamStr);
+        rez1.push_back(structCompact);
+        rez1.push_back(stepCentr);
+        SafeResultInExcellFile(rez1,ksb,rank3,rank4);
     }
+    else
+        SafeResultInExcellFile(rez1,ksb,vector<double>(),vector<double>());
 
+}
+
+matrix<int> LoadMatrixFromFile()
+{
+    using namespace libxl;
+
+    vector<vector<int>>_matrix;
+
+    //Создание объекта для работы с Excell документом
+    Book* book = xlCreateBook();
+
+    //открытие файла
+    book->load("matrixExell.xls");
+    if(book)
+    {
+        //обращение к первой вкладке
+        Sheet* sheet = book->getSheet(0);
+
+        //Если такая вкладка существует в книге(документе)
+        if(sheet)
+        {
+            //проходим по строкам документа
+            for(int row = sheet->firstRow();row<sheet->lastRow(); ++row)
+            {
+                //добавление строки в матрицу
+                _matrix.push_back(vector<int>());
+
+                //проходим по столбцам строки и считываем числа в матрицу
+                for(int col = sheet->firstCol(); col<sheet->lastRow();++col)
+                    _matrix[row-1].push_back(sheet->readNum(row,col));
+            }
+        }
+    }
+    else
+        cout<<book->errorMessage();
+
+    //закрываем документ
+    book->release();
+    return _matrix;
+
+}
+
+void SafeResultInExcellFile(vector<double> someParams,bool qsb,vector<double> rank3,vector<double> rank4)
+{
+    using namespace libxl;
+
+    //Создание объекта для работы с Excell документом
+    Book* book = xlCreateBook();
+
+    //открытие файла
+    bool loadResult = book->load("matrixExell.xls");
+    if(loadResult)
+    {
+        if(book->sheetCount()<2)
+            book->addSheet("result");
+
+        Sheet* shetResult = book->getSheet(1);
+        shetResult->clear();
+
+        shetResult->writeStr(1,1,"Kooficient svyaznosti K = ");
+        shetResult->writeNum(2,1,someParams[0]);
+        shetResult->writeStr(3,1,((qsb)?"Struktura svyaznaya":"Struktura ne svyaznaya"));
+        shetResult->writeStr(4,1,"Kooficient izbytochnosti R = ");
+        shetResult->writeNum(5,1,someParams[1]);
+
+        if(someParams[1]==0)
+            shetResult->writeStr(6,1,"Struktura svyazno-minimal'na");
+
+        if(someParams[1]<0)
+            shetResult->writeStr(6,1,"Struktura svyazno-izbytochna");
+
+        if(qsb)
+        {
+            shetResult->writeStr(7,1,"Kvadratnoe otklonenie zadannogo raspredeleniya stepeni vershin E^2 = ");
+            shetResult->writeNum(8,1,someParams[2]);
+            shetResult->writeStr(9,1,"Diametr struktury = ");
+            shetResult->writeNum(10,1,someParams[3]);
+            shetResult->writeStr(11,1,"Qotn = ");
+            shetResult->writeNum(12,1,someParams[4]);
+
+            if((someParams[4]>=0) & (someParams[4]<=1))
+                shetResult->writeStr(13,1,"0 <= Qotn <= 1");
+            if(someParams[4]==0)
+                shetResult->writeStr(14,1,"Struktura kompaktnaya.");
+            if(someParams[4]==1)
+                shetResult->writeStr(14,1,"Struktura nekompaktnaya.");
+
+            shetResult->writeStr(15,1,"Indeks centralizacii b = ");
+            shetResult->writeNum(16,1,someParams[5]);
+            shetResult->writeStr(17,1,"Rangi elementov dlya k=3:");
+            for(unsigned int i=0;i<rank3.size();i++)
+                shetResult->writeNum(18,i+1,rank3[i]);
+            shetResult->writeStr(19,1,"Rangi elementov dlya k=4:");
+            for(unsigned int i=0;i<rank3.size();i++)
+                shetResult->writeNum(20,i+1,rank4[i]);
+        }
+    }
+    else
+        cout<<book->errorMessage();
+    book->save("matrixExell.xls");
+    book->release();
 }
