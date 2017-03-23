@@ -2,7 +2,8 @@
 #include <methods.h>
 #include <iomanip>
 #include <memory>
-#include <libxl.h>
+#include "libxl.h"
+#include <vector>
 
 using namespace std;
 
@@ -15,10 +16,6 @@ matrix<int> GetSomeMatrixByIndex(const unsigned short int);     //выдает �
 void ShowMatrixToMonitor(const matrix<int>&) noexcept;          //выводит матрицу на экран
 void AnalysSystem(const matrix<int>& m);                        //выполняет анализ системы по матрице смежности
 matrix<int> LoadMatrixFromFile();                               //загружает матрицу из файла
-
-
-//Константа указывающая имя документа из которого считывается матрица
-const char* DOCUMENT_NAME = "matrixExell.xlsx";
 
 
 int main()
@@ -169,10 +166,16 @@ matrix<int> LoadMatrixFromFile()
 {
     using namespace libxl;
 
+    vector<vector<int>>_matrix;
+
     //Создание объекта для работы с Excell документом
     Book* book = xlCreateBook();
+
+
+
     //открытие файла
-    if(book->load(DOCUMENT_NAME))
+    bool loadResult = book->load("D:\\Work\\GitHubProjects\\islMethods\\isledovanieSys\\matrixExell.xls");
+    if(loadResult)
     {
         //обращение к первой вкладке
         Sheet* sheet = book->getSheet(0);
@@ -181,28 +184,27 @@ matrix<int> LoadMatrixFromFile()
         if(sheet)
         {
             //проходим по строкам документа
-            for(unsigned int row = sheet->firstRow();row<sheet->lastRow(); ++row)
+            for(int row = sheet->firstRow();row<sheet->lastRow(); ++row)
             {
+                //Создание строки в матрице
+                _matrix.push_back(vector<int>());
+
                 //проходим по столбцам строки
-                for(unsigned int col = sheet->firstCol(); col<sheet->lastCol();++col)
+                for(int col = sheet->firstCol(); col<sheet->lastRow();++col)
                 {
-                    //обращение к ячейке в указанной строке и колонке
-                    CellType cellType = sheet->cellType(row,col);
-
-                    if(cellType == CELLTYPE_NUMBER)//Если в ячейке число то извлекаем его
-                        unsigned int num = sheet->readNum(row,col);
-
+                    _matrix[row-1].push_back(sheet->readNum(row,col));
                 }
+
             }
 
         }
 
     }
     else
-        cout<<"ошибка открытия файла.";
+        cout<<book->errorMessage();
 
     //закрываем документ
     book->release();
-    return matrix<int>();
+    return _matrix;
 
 }
