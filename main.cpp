@@ -31,11 +31,8 @@ void SafeResultInExcellFile(vector<long double>,bool,vector<long double>,vector<
 
 int main()
 {
-    //+:1,2,3,5
-    //-:
-    //+-:4(Qotn =0,8|->(0.7))
-    matrix<int> m = GetSomeMatrixByIndex(4);
-    //matrix<int> m = LoadMatrixFromFile();
+    //matrix<int> m = GetSomeMatrixByIndex(4);
+    matrix<int> m = LoadMatrixFromFile();
     cout<<endl;
     if(m.size()>0)
         AnalysSystem(m);
@@ -179,10 +176,10 @@ void AnalysSystem(const matrix<int>& m)
         rez1.push_back(diamStr);
         rez1.push_back(structCompact);
         rez1.push_back(stepCentr);
-        //SafeResultInExcellFile(rez1,ksb,rank3,rank4);
+        SafeResultInExcellFile(rez1,ksb,rank3,rank4);
     }
-    //else
-        //SafeResultInExcellFile(rez1,ksb,vector<long double>(),vector<long double>());
+   else
+        SafeResultInExcellFile(rez1,ksb,vector<long double>(),vector<long double>());
 
 }
 
