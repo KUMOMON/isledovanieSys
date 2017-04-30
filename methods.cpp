@@ -1,5 +1,6 @@
 #include <vector>       //модуль расширяемых массивов
 #include <math.h>       //модуль математических функций
+#include <c++/limits>   //для извлечения границ типов
 
 namespace islMethods {
 
@@ -29,13 +30,13 @@ matrix<int> minPaths(const matrix<int>& m);
 
 //Ранги элементов системы с длинной N
 //Расм. рерсурсы в системе в порядке их значимости
-vector<float> RangElementsN(const matrix<int>&,const unsigned int);
+vector<long double> RangElementsN(const matrix<int>&,const unsigned int);
 
 ////////////////////////////////////////////////////////////////
 
-float Svaznost(const matrix<int>& m)
+long double Svaznost(const matrix<int>& m)
 {
-    float rez=0;
+    long double rez=0;
     for(indexer row=0;row<m.size();row++)
         for(indexer cell=0;cell<m[row].size();cell++)
             rez+=m[row][cell];
@@ -43,9 +44,9 @@ float Svaznost(const matrix<int>& m)
     return rez;
 }
 
-float Izbitochnost(const matrix<int>& m)
+long double Izbitochnost(const matrix<int>& m)
 {
-    float rez=0;
+    long double rez=0;
     indexer N = m.size();
     for(indexer row=0;row<N;row++)
         for(indexer cell=0;cell<N;cell++)
@@ -55,19 +56,19 @@ float Izbitochnost(const matrix<int>& m)
     return rez;
 }
 
-float Ravnomernost(const matrix<int> & m)
+long double Ravnomernost(const matrix<int> & m)
 {
     //вершины
     indexer N = m.size();
     //ребра
-    float M=0;
+    long double M=0;
 
     //расчет количества дуг
     for(indexer row=0;row<N;row++)
         for(indexer cell = row;cell<N;cell++)
             M+=m[row][cell];
     //ро
-    float qsr=4*static_cast<float>(M*M)/static_cast<float>(N);
+    long double qsr=4*static_cast<long double>(M*M)/static_cast<long double>(N);
 
     //вектор с кол-вом дуг исхода(i - точка исхода)
     //инициализация вектора с размерностью N
@@ -85,9 +86,9 @@ float Ravnomernost(const matrix<int> & m)
     }
 
     //среднее квадрватичное отклонение
-    float sko=0;
+    long double sko=0;
     for(indexer point =0; point<N;point++)
-        sko+=pow((static_cast<float>(qi[point])),2);
+        sko+=pow((static_cast<long double>(qi[point])),2);
     sko-=qsr;
     return sko;
 }
@@ -97,7 +98,8 @@ int DiamStruct(const matrix<int>& m)
     indexer N = m.size();        //кол-во вершин
     matrix<int> D = minPaths(m); //Получение матрицы минимальных путей
 
-    int diametr = 0;       //диаметр структуры
+    numeric_limits<int> d;       //структура для доступа к min и max значениям значимых числовых типов
+    int diametr = d.min();       //диаметр структуры
     for(indexer pointI=0;pointI<N;pointI++)
         for(indexer pointJ=0;pointJ<N;pointJ++)
             if(diametr<D[pointI][pointJ]) diametr = D[pointI][pointJ];
@@ -105,30 +107,30 @@ int DiamStruct(const matrix<int>& m)
     return diametr;
 }
 
-float StructCompactOtn(const matrix<int>& m)
+long double StructCompactOtn(const matrix<int>& m)
 {
-    float Q_otn=0;             //Относительная структурная близость
+    long double Q_otn=0;             //Относительная структурная близость
 
     indexer N = m.size();       //кол-во вершин
     int Q = StructProximity(m); //структурная близость
     int Qmin = N*(N-1);         //Минимальная структурная близость
 
-    Q_otn = (static_cast<float>(Q)/static_cast<float>(Qmin))-1;
-
+    Q_otn = (static_cast<long double>(Q)/static_cast<long double>(Qmin))-1;
+    //Q_otn = (Q/Qmin)-1;
     return Q_otn;
 }
-///--------------------------------------
-float StepenCentr(const matrix<int>& m)
+
+long double StepenCentr(const matrix<int>& m)
 {
 
     indexer N = m.size();               //кол-во вершин
     auto matrixMinPaths = minPaths(m);  //матрица минимальных путей
     int Q = StructProximity(m);         //структурная близость
 
-    vector<float> z(N);                //хранит степень центральности
+    vector<long double> z(N);                //хранит степень центральности
     for(indexer i=0;i<N;i++) z[i]=0;    //структурного элемента
 
-    float indexCentr = 0;              //индекс централизации
+    long double indexCentr = 0;              //индекс централизации
 
     //Оценка централизации каждой точки
     for(indexer pointI=0;pointI<N;pointI++)
@@ -137,10 +139,10 @@ float StepenCentr(const matrix<int>& m)
         for(indexer pointJ=0;pointJ<N;pointJ++)
             if(pointI!=pointJ)
                 z[pointI]+=matrixMinPaths[pointI][pointJ];
-        z[pointI]=static_cast<float>(Q)/(2.0*(z[pointI]));
+        z[pointI]=static_cast<long double>(Q)/(2.0*(z[pointI]));
     }
 
-    float zMax = 0;
+    long double zMax = 0;
 
     for(indexer point=0;point<N;point++)
         if(zMax<z[point]) zMax = z[point];
@@ -149,24 +151,24 @@ float StepenCentr(const matrix<int>& m)
     return indexCentr;
 }
 
-vector<float> RangElements3(const matrix<int>& m)
+vector<long double> RangElements3(const matrix<int>& m)
 {
     return RangElementsN(m,3);
 }
 
-vector<float> RangElements4(const matrix<int>& m)
+vector<long double> RangElements4(const matrix<int>& m)
 {
     return RangElementsN(m,4);
 }
 
 ////////////////////////////////////////////////////////////////
 
-vector<float> RangElementsN(const matrix<int>& m,const unsigned int n)
+vector<long double> RangElementsN(const matrix<int>& m,const unsigned int n)
 {
     indexer N = m.size();          //кол-во вершин
     auto _matrix = GetSteps(m);    //Получение всех степеней
 
-    vector<float> elementsRank(N);
+    vector<long double> elementsRank(N);
 
     //elementsRank[i]=top/down;
 
@@ -182,7 +184,7 @@ vector<float> RangElementsN(const matrix<int>& m,const unsigned int n)
         for(indexer j=0;j<N;j++)
             top+=_matrix[n][i][j];
 
-        elementsRank[i] = static_cast<float>(top)/down;
+        elementsRank[i] = static_cast<long double>(top)/down;
     }
     return elementsRank;
 }
@@ -218,7 +220,7 @@ matrix<int> minPaths(const matrix<int>& m)
     for(indexer stepen=0;stepen<N;stepen++)
         for(indexer row=0;row<N;row++)
             for(indexer coll=0;coll<N;coll++)
-                if((D[row][coll]==0)&(PN[stepen][row][coll]>0)&row!=coll)
+                if((D[row][coll]==0)&(PN[stepen][row][coll]>0)&(row!=coll))
                     D[row][coll] = stepen+1;
     return D;
 }

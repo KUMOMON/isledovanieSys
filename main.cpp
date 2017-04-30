@@ -26,7 +26,7 @@ void AnalysSystem(const matrix<int>& m);                        //выполня
 matrix<int> LoadMatrixFromFile();                               //загружает матрицу из файла
 
 //выполняет сохранение результатов исследования в файл
-void SafeResultInExcellFile(vector<float>,bool,vector<float>,vector<float>);
+void SafeResultInExcellFile(vector<long double>,bool,vector<long double>,vector<long double>);
 
 
 int main()
@@ -34,7 +34,7 @@ int main()
     //+:1,2,3,5
     //-:
     //+-:4(Qotn =0,8|->(0.7))
-    matrix<int> m = GetSomeMatrixByIndex(6);
+    matrix<int> m = GetSomeMatrixByIndex(4);
     //matrix<int> m = LoadMatrixFromFile();
     cout<<endl;
     if(m.size()>0)
@@ -114,8 +114,8 @@ void AnalysSystem(const matrix<int>& m)
 
     unsigned int N = m.size();      //количество вершин
 
-    float ks = Svaznost(m);        //Коофициент связности
-    float R = Izbitochnost(m);     //Коофициент ихбыточности
+    long double ks = Svaznost(m);        //Коофициент связности
+    long double R = Izbitochnost(m);     //Коофициент ихбыточности
     bool ksb = (ks>=N-1);           //показатель связности
 
     cout<<"Sistema:"<<endl;
@@ -132,15 +132,15 @@ void AnalysSystem(const matrix<int>& m)
     if(R<0)
         cout<<"Struktura svyazno-izbytochna"<<'.'<<endl;
     cout<<endl;
-    vector<float> rez1={ks,R};
+    vector<long double> rez1={ks,R};
     if(ksb)
     {
-        float sko = 0;            //Равномерность распределения связей
-        float diamStr = 0;        //Диаметр структуры
-        float structCompact = 0;  //Структурная компактность(относительная)
-        float stepCentr = 0;      //Степень централизации
-        vector<float> rank3;      //ранги элементов длинной 3
-        vector<float> rank4;      //ранги элементов длинной 4
+        long double sko = 0;            //Равномерность распределения связей
+        long double diamStr = 0;        //Диаметр структуры
+        long double structCompact = 0;  //Структурная компактность(относительная)
+        long double stepCentr = 0;      //Степень централизации
+        vector<long double> rank3;      //ранги элементов длинной 3
+        vector<long double> rank4;      //ранги элементов длинной 4
 
         sko = Ravnomernost(m);
         cout<<"Kvadratnoe otklonenie zadannogo raspredeleniya stepeni vershin"<<endl<<"E^2 = "<<sko<<'.'<<endl;
@@ -182,7 +182,7 @@ void AnalysSystem(const matrix<int>& m)
         //SafeResultInExcellFile(rez1,ksb,rank3,rank4);
     }
     //else
-        //SafeResultInExcellFile(rez1,ksb,vector<double>(),vector<double>());
+        //SafeResultInExcellFile(rez1,ksb,vector<long double>(),vector<long double>());
 
 }
 
@@ -226,7 +226,7 @@ matrix<int> LoadMatrixFromFile()
 
 }
 
-void SafeResultInExcellFile(vector<float> someParams,bool qsb,vector<float> rank3,vector<float> rank4)
+void SafeResultInExcellFile(vector<long double> someParams,bool qsb,vector<long double> rank3,vector<long double> rank4)
 {
     using namespace libxl;
 

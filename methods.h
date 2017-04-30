@@ -27,30 +27,30 @@ using matrix = vector<vector<T>>;
 ////////////////////////////////////////////////////////////////
 
 //Возвращает коофициент связности по матрице смежности
-float Svaznost(const matrix<int>&);
+long double Svaznost(const matrix<int>&);
 
 //Возвращает коофициент избыточности по матрице смежности
-float Izbitochnost(const matrix<int>&);
+long double Izbitochnost(const matrix<int>&);
 
 //возвращает равномерность распределения связей по матрице смежности
 //или недоиспользование структуры при достижении максимальной связности
-float Ravnomernost(const matrix<int>&);
+long double Ravnomernost(const matrix<int>&);
 
 //Вычисляет диаметр структуры (х-ка относиться с структурной компактности)
 int DiamStruct(const matrix<int>&);
 
 //возвращает структурную компактность относительную (близость элементов между собой)
-float StructCompactOtn(const matrix<int>&);
+long double StructCompactOtn(const matrix<int>&);
 
 //Степень централизации в структуре
-float StepenCentr(const matrix<int>&);
+long double StepenCentr(const matrix<int>&);
 
 //Ранги элементов системы с длинной 3
 //Расм. рерсурсы в системе в порядке их значимости
-vector<float> RangElements3(const matrix<int>&);
+vector<long double> RangElements3(const matrix<int>&);
 
 //Ранги элементов системы с длинной 4
-vector<float> RangElements4(const matrix<int>&);
+vector<long double> RangElements4(const matrix<int>&);
 
 }
 
