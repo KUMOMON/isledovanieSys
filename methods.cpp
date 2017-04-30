@@ -116,7 +116,6 @@ long double StructCompactOtn(const matrix<int>& m)
     int Qmin = N*(N-1);         //Минимальная структурная близость
 
     Q_otn = (static_cast<long double>(Q)/static_cast<long double>(Qmin))-1;
-    //Q_otn = (Q/Qmin)-1;
     return Q_otn;
 }
 
