@@ -1,5 +1,6 @@
-#include <vector>   //модуль расширяемых массивов
-#include <math.h> //модуль математических функций
+#include <vector>       //модуль расширяемых массивов
+#include <math.h>       //модуль математических функций
+#include <c++/limits>   //для извлечения границ типов
 
 namespace islMethods {
 
@@ -29,13 +30,13 @@ matrix<int> minPaths(const matrix<int>& m);
 
 //Ранги элементов системы с длинной N
 //Расм. рерсурсы в системе в порядке их значимости
-vector<double> RangElementsN(const matrix<int>&,const unsigned int);
+vector<long double> RangElementsN(const matrix<int>&,const unsigned int);
 
 ////////////////////////////////////////////////////////////////
 
-double Svaznost(const matrix<int>& m)
+long double Svaznost(const matrix<int>& m)
 {
-    double rez=0;
+    long double rez=0;
     for(indexer row=0;row<m.size();row++)
         for(indexer cell=0;cell<m[row].size();cell++)
             rez+=m[row][cell];
@@ -43,9 +44,9 @@ double Svaznost(const matrix<int>& m)
     return rez;
 }
 
-double Izbitochnost(const matrix<int>& m)
+long double Izbitochnost(const matrix<int>& m)
 {
-    double rez=0;
+    long double rez=0;
     indexer N = m.size();
     for(indexer row=0;row<N;row++)
         for(indexer cell=0;cell<N;cell++)
@@ -55,19 +56,19 @@ double Izbitochnost(const matrix<int>& m)
     return rez;
 }
 
-double Ravnomernost(const matrix<int> & m)
+long double Ravnomernost(const matrix<int> & m)
 {
     //вершины
     indexer N = m.size();
     //ребра
-    double M=0;
+    long double M=0;
 
     //расчет количества дуг
     for(indexer row=0;row<N;row++)
         for(indexer cell = row;cell<N;cell++)
             M+=m[row][cell];
     //ро
-    double qsr=2*M/N;
+    long double qsr=4*static_cast<long double>(M*M)/static_cast<long double>(N);
 
     //вектор с кол-вом дуг исхода(i - точка исхода)
     //инициализация вектора с размерностью N
@@ -85,21 +86,20 @@ double Ravnomernost(const matrix<int> & m)
     }
 
     //среднее квадрватичное отклонение
-    double sko=0;
+    long double sko=0;
     for(indexer point =0; point<N;point++)
-        sko+=pow((static_cast<double>(qi[point])-qsr),2);
-
+        sko+=pow((static_cast<long double>(qi[point])),2);
+    sko-=qsr;
     return sko;
-
 }
 
-double DiamStruct(const matrix<int>& m)
+int DiamStruct(const matrix<int>& m)
 {
     indexer N = m.size();        //кол-во вершин
     matrix<int> D = minPaths(m); //Получение матрицы минимальных путей
 
-
-    int diametr =0;             //диаметр структуры
+    numeric_limits<int> d;       //структура для доступа к min и max значениям значимых числовых типов
+    int diametr = d.min();       //диаметр структуры
     for(indexer pointI=0;pointI<N;pointI++)
         for(indexer pointJ=0;pointJ<N;pointJ++)
             if(diametr<D[pointI][pointJ]) diametr = D[pointI][pointJ];
@@ -107,66 +107,67 @@ double DiamStruct(const matrix<int>& m)
     return diametr;
 }
 
-double StructCompactOtn(const matrix<int>& m)
+long double StructCompactOtn(const matrix<int>& m)
 {
-    double Q_otn=0;             //Относительная структурная близость
+    long double Q_otn=0;             //Относительная структурная близость
 
     indexer N = m.size();       //кол-во вершин
     int Q = StructProximity(m); //структурная близость
     int Qmin = N*(N-1);         //Минимальная структурная близость
 
-    Q_otn = static_cast<double>(Q)/static_cast<double>(Qmin)-1;
-
+    Q_otn = (static_cast<long double>(Q)/static_cast<long double>(Qmin))-1;
     return Q_otn;
 }
 
-double StepenCentr(const matrix<int>& m)
+long double StepenCentr(const matrix<int>& m)
 {
 
     indexer N = m.size();               //кол-во вершин
     auto matrixMinPaths = minPaths(m);  //матрица минимальных путей
     int Q = StructProximity(m);         //структурная близость
-    vector<double> t(N);                //
-    double indexCentr = 0;              //индекс централизации
+
+    vector<long double> z(N);                //хранит степень центральности
+    for(indexer i=0;i<N;i++) z[i]=0;    //структурного элемента
+
+    long double indexCentr = 0;              //индекс централизации
 
     //Оценка централизации каждой точки
     for(indexer pointI=0;pointI<N;pointI++)
     {
-        t[pointI]=0;
+        z[pointI]=0;
         for(indexer pointJ=0;pointJ<N;pointJ++)
             if(pointI!=pointJ)
-                t[pointI]+=matrixMinPaths[pointI][pointJ];
-        t[pointI] = static_cast<double>(1)/t[pointI] ;
-        t[pointI]*=Q/2;
+                z[pointI]+=matrixMinPaths[pointI][pointJ];
+        z[pointI]=static_cast<long double>(Q)/(2.0*(z[pointI]));
     }
 
-    double tmax = 0;
+    long double zMax = 0;
 
     for(indexer point=0;point<N;point++)
-        if(tmax<t[point]) tmax = t[point];
-
-    indexCentr = (N-1)*(2*tmax-N)*(1/(tmax*(N-2)));
+        if(zMax<z[point]) zMax = z[point];
+    //?
+    indexCentr = ((N-1)*(2*zMax-N))/((N-2)*zMax);
     return indexCentr;
 }
 
-vector<double> RangElements3(const matrix<int>& m)
+vector<long double> RangElements3(const matrix<int>& m)
 {
     return RangElementsN(m,3);
 }
 
-vector<double> RangElements4(const matrix<int>& m)
+vector<long double> RangElements4(const matrix<int>& m)
 {
     return RangElementsN(m,4);
 }
 
 ////////////////////////////////////////////////////////////////
 
-vector<double> RangElementsN(const matrix<int>& m,const unsigned int n)
+vector<long double> RangElementsN(const matrix<int>& m,const unsigned int n)
 {
     indexer N = m.size();          //кол-во вершин
     auto _matrix = GetSteps(m);    //Получение всех степеней
 
-    vector<double> elementsRank(N);
+    vector<long double> elementsRank(N);
 
     //elementsRank[i]=top/down;
 
@@ -182,7 +183,7 @@ vector<double> RangElementsN(const matrix<int>& m,const unsigned int n)
         for(indexer j=0;j<N;j++)
             top+=_matrix[n][i][j];
 
-        elementsRank[i] = static_cast<double>(top)/down;
+        elementsRank[i] = static_cast<long double>(top)/down;
     }
     return elementsRank;
 }
@@ -203,12 +204,14 @@ int StructProximity(const matrix<int>& m)
     return Q;
 }
 
+//?
 matrix<int> minPaths(const matrix<int>& m)
 {
     //кол-во вершин
     indexer N = m.size();
     //Создание копии матрицы
     matrix<int> D(m);
+
     //Получение всех степеней этой матрицы
     vector<matrix<int>> PN = GetSteps(m);
 
@@ -216,7 +219,7 @@ matrix<int> minPaths(const matrix<int>& m)
     for(indexer stepen=0;stepen<N;stepen++)
         for(indexer row=0;row<N;row++)
             for(indexer coll=0;coll<N;coll++)
-                if((D[row][coll]==0)&(PN[stepen][row][coll]>0))
+                if((D[row][coll]==0)&(PN[stepen][row][coll]>0)&(row!=coll))
                     D[row][coll] = stepen+1;
     return D;
 }

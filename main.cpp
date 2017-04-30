@@ -4,6 +4,14 @@
 #include <memory>
 #include "libxl.h"
 #include <vector>
+#include <math.h>
+
+/*
+ * K-связность
+ * R-повышение общ. числа связей в системе над min необходимым
+ * e^2 - неравномерность связей
+ * Qotn -
+ */
 
 using namespace std;
 
@@ -18,14 +26,16 @@ void AnalysSystem(const matrix<int>& m);                        //выполня
 matrix<int> LoadMatrixFromFile();                               //загружает матрицу из файла
 
 //выполняет сохранение результатов исследования в файл
-void SafeResultInExcellFile(vector<double>,bool,vector<double>,vector<double>);
+void SafeResultInExcellFile(vector<long double>,bool,vector<long double>,vector<long double>);
 
 
 int main()
 {
-
-    //matrix<int> m = GetSomeMatrixByIndex(6);
-    matrix<int> m = LoadMatrixFromFile();
+    //+:1,2,3,5
+    //-:
+    //+-:4(Qotn =0,8|->(0.7))
+    matrix<int> m = GetSomeMatrixByIndex(4);
+    //matrix<int> m = LoadMatrixFromFile();
     cout<<endl;
     if(m.size()>0)
         AnalysSystem(m);
@@ -104,8 +114,8 @@ void AnalysSystem(const matrix<int>& m)
 
     unsigned int N = m.size();      //количество вершин
 
-    double ks = Svaznost(m);        //Коофициент связности
-    double R = Izbitochnost(m);     //Коофициент ихбыточности
+    long double ks = Svaznost(m);        //Коофициент связности
+    long double R = Izbitochnost(m);     //Коофициент ихбыточности
     bool ksb = (ks>=N-1);           //показатель связности
 
     cout<<"Sistema:"<<endl;
@@ -122,23 +132,23 @@ void AnalysSystem(const matrix<int>& m)
     if(R<0)
         cout<<"Struktura svyazno-izbytochna"<<'.'<<endl;
     cout<<endl;
-    vector<double> rez1={ks,R};
+    vector<long double> rez1={ks,R};
     if(ksb)
     {
-        double sko = 0;            //Равномерность распределения связей
-        double diamStr = 0;        //Диаметр структуры
-        double structCompact = 0;  //Структурная компактность(относительная)
-        double stepCentr = 0;      //Степень централизации
-        vector<double> rank3;      //ранги элементов длинной 3
-        vector<double> rank4;      //ранги элементов длинной 4
+        long double sko = 0;            //Равномерность распределения связей
+        long double diamStr = 0;        //Диаметр структуры
+        long double structCompact = 0;  //Структурная компактность(относительная)
+        long double stepCentr = 0;      //Степень централизации
+        vector<long double> rank3;      //ранги элементов длинной 3
+        vector<long double> rank4;      //ранги элементов длинной 4
 
         sko = Ravnomernost(m);
-        cout<<"Kvadratnoe otklonenie zadannogo raspredeleniya stepeni vershin E^2 = "<<sko<<'.'<<endl;
+        cout<<"Kvadratnoe otklonenie zadannogo raspredeleniya stepeni vershin"<<endl<<"E^2 = "<<sko<<'.'<<endl;
         cout<<"Struktura "<<((sko==0)?"ravnomernaya":"neravnomernaya")<<'.'<<endl<<endl;
 
         diamStr = DiamStruct(m);
         structCompact = StructCompactOtn(m);
-        cout<<"Diametr struktury = "<<diamStr<<'.'<<endl;
+        cout<<"Diametr struktury (d)= "<<diamStr<<'.'<<endl;
         cout<<"Qotn = "<<structCompact<<'.'<<endl;
 
         if((structCompact>=0) & (structCompact<=1))
@@ -150,7 +160,8 @@ void AnalysSystem(const matrix<int>& m)
         cout<<endl;
 
         stepCentr = StepenCentr(m);
-        cout<<"Indeks centralizacii b = "<<stepCentr<<'.'<<endl;
+
+        cout<<"Indeks centralizacii b = "<<roundf(stepCentr*10)/10<<'.'<<endl;
 
         rank3 = RangElements3(m);
         cout<<"Rangi elementov dlya k=3:"<<endl;
@@ -168,10 +179,10 @@ void AnalysSystem(const matrix<int>& m)
         rez1.push_back(diamStr);
         rez1.push_back(structCompact);
         rez1.push_back(stepCentr);
-        SafeResultInExcellFile(rez1,ksb,rank3,rank4);
+        //SafeResultInExcellFile(rez1,ksb,rank3,rank4);
     }
-    else
-        SafeResultInExcellFile(rez1,ksb,vector<double>(),vector<double>());
+    //else
+        //SafeResultInExcellFile(rez1,ksb,vector<long double>(),vector<long double>());
 
 }
 
@@ -215,7 +226,7 @@ matrix<int> LoadMatrixFromFile()
 
 }
 
-void SafeResultInExcellFile(vector<double> someParams,bool qsb,vector<double> rank3,vector<double> rank4)
+void SafeResultInExcellFile(vector<long double> someParams,bool qsb,vector<long double> rank3,vector<long double> rank4)
 {
     using namespace libxl;
 
